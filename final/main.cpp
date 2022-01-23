@@ -1,7 +1,42 @@
 #include "header.h"
 QMap< QString , person_info > source_map;
 QMap< QString , QVector<QString> > connections;
+QMap< QString , int > level;
 using namespace std;
+void BSF(QString person_id, int maxDegree )
+{
+
+    QQueue <person_info> queue;
+    person_info user = source_map.value(person_id);
+    queue.enqueue(user);
+    level.insert(user.id , 0);
+
+        while(!queue.isEmpty())
+        {
+
+            person_info u = queue.dequeue();
+
+            int degree = level.value(u.id);
+
+            if(degree==maxDegree)
+                 break;
+
+             for (int s=0; s < connections.value(u.id).size(); s++) {
+                 QString connect= connections.value(u.id).at(s);
+                 person_info add = source_map.value(connect);
+                  if(level.contains(connect))
+                      continue;
+
+                  level.insert(connect , degree + 1);
+                  queue.enqueue(add);
+
+             }
+
+
+        }
+        level.remove(user.id);
+
+}
 void ParseClass::parseJsonFile()
 {
     QFile file(QString::fromStdString("DATA.json"));
@@ -48,6 +83,27 @@ int main(int argc, char *argv[])
     int num;
     ParseClass obj;
     obj.parseJsonFile();
+    while(1)
+     {
+         cout<<"1 ) Finding suggestions ";
+         cout<<"\n2 ) Exit ";
+         cout<<"\nInput : ";
+         cin>>num;
+         cin.ignore();
+           if(num==1)
+             {
+                cout<<"Please Enter ID : ";
+                string str;
+                getline(cin, str);
+                QString id(str.c_str());
+                BSF(id , 5 );
+
+              }
+
+              else if(num==2)
+                  break;
+
+        }
 
     QCoreApplication a(argc, argv);
     return a.exec();
