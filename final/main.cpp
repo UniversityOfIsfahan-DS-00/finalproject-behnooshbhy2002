@@ -2,6 +2,7 @@
 QMap< QString , person_info > source_map;
 QMap< QString , QVector<QString> > connections;
 QMap< QString , int > level;
+QMap< QString , int > fri_score;
 using namespace std;
 void BSF(QString person_id, int maxDegree )
 {
@@ -37,6 +38,75 @@ void BSF(QString person_id, int maxDegree )
         level.remove(user.id);
 
 }
+int final_scores(person_info user , person_info friend_user , int degree)
+{
+    int score = 0 ;
+
+
+    //University Location
+      if(user.UniLocation == friend_user.UniLocation)
+      {
+          score+=1;
+          QString user_birth = user.birth.left(4);
+          QString friend_birth = friend_user.birth.left(4);
+          int dif = user_birth.toInt() - friend_birth.toInt();
+          if(dif<=1 && dif>=-1)
+              score+=1;
+      }
+    //field
+      if(user.field == friend_user.field)
+          score+=2;
+    //work place
+      if(user.workplace == friend_user.workplace)
+          score+=2;
+    //specialites
+      for(int i = 0 ; i < user.specialties.size(); i++)
+      {
+          for(int j = 0; j<friend_user.specialties.size(); j++)
+          {
+              if(user.specialties[i]==friend_user.specialties[j])
+                  score+=2;
+          }
+      }
+     //Degree
+      degree = 6 - degree;
+      score+=degree;
+
+    return score;
+}
+void suggestions(QString id)
+{
+    QVector <person_score> vec;
+    person_score p;
+    QMap< QString , int >::const_iterator e = level.constBegin();
+    while(e != level.constEnd())
+    {
+       int score = final_scores( source_map.value(id) , source_map.value(e.key()), e.value());
+        p.user=source_map.value(e.key());
+        p.score = score;
+        vec.push_back(p);
+        ++e;
+    }
+    sort(vec.begin() , vec.end() , less_than_key());
+
+    print(vec , id);
+
+    vec.clear();
+}
+
+void print(QVector <person_score> vec , QString id)
+{
+    cout<<"\nrecommendation For "<<source_map.value(id).name.toStdString()<<" are "<<endl;
+    cout<<"number\tID\tName\n";
+    for(int y=0; y<vec.size(); y++)
+    {
+        cout<<y+1<<"\t|"<<vec[y].user.id.toStdString()<<"\t| "<<vec[y].user.name.toStdString()<<endl;
+
+        if(y==19)
+              break;
+    }
+}
+
 void ParseClass::parseJsonFile()
 {
     QFile file(QString::fromStdString("DATA.json"));
@@ -78,6 +148,11 @@ void ParseClass::parseJsonFile()
      }
 
 }
+void clear()
+{
+    level.clear();
+    fri_score.clear();
+}
 int main(int argc, char *argv[])
 {
     int num;
@@ -97,11 +172,14 @@ int main(int argc, char *argv[])
                 getline(cin, str);
                 QString id(str.c_str());
                 BSF(id , 5 );
+                suggestions(id);
+                clear();
+                cout<<endl;
 
               }
 
               else if(num==2)
-                  break;
+                  exit(0);
 
         }
 
