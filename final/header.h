@@ -65,7 +65,7 @@ class less_than_key
     public:
     inline bool operator() (const person_score& u1, const person_score& u2)
     {
-        return (u1.score >= u2.score);
+        return (u1.score > u2.score);
     }
 };
 void print(QVector <person_score> vec , QString id);

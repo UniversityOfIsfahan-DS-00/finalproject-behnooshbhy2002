@@ -55,7 +55,7 @@ int final_scores(person_info user , person_info friend_user , int degree)
       }
     //field
       if(user.field == friend_user.field)
-          score+=2;
+          score+=3;
     //work place
       if(user.workplace == friend_user.workplace)
           score+=2;
@@ -65,7 +65,7 @@ int final_scores(person_info user , person_info friend_user , int degree)
           for(int j = 0; j<friend_user.specialties.size(); j++)
           {
               if(user.specialties[i]==friend_user.specialties[j])
-                  score+=2;
+                  score+=3;
           }
       }
      //Degree
